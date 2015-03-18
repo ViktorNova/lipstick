@@ -315,7 +315,7 @@ void WindowPixmapItem::setWindowId(int id)
     if (m_item) {
         if (m_item->surface()) {
             disconnect(m_item->surface(), SIGNAL(sizeChanged()), this, SIGNAL(windowSizeChanged()));
-            disconnect(m_item.data(), &QWaylandSurfaceItem::surfaceDestroyed, this, &WindowPixmapItem::surfaceDestroyed);
+            disconnect(m_item.data(), &QObject::destroyed, this, &WindowPixmapItem::windowDestroyed);
         }
         m_item->imageRelease();
         m_item = 0;
@@ -329,7 +329,7 @@ void WindowPixmapItem::setWindowId(int id)
         emit windowSizeChanged();
 }
 
-void WindowPixmapItem::surfaceDestroyed()
+void WindowPixmapItem::windowDestroyed()
 {
     setWindowId(0);
 }
@@ -460,7 +460,7 @@ void WindowPixmapItem::updateItem()
             m_item = w;
             delete m_shaderEffect; m_shaderEffect = 0;
             connect(m_item->surface(), SIGNAL(sizeChanged()), this, SIGNAL(windowSizeChanged()));
-            connect(m_item.data(), &QWaylandSurfaceItem::surfaceDestroyed, this, &WindowPixmapItem::surfaceDestroyed);
+            connect(m_item.data(), &QObject::destroyed, this, &WindowPixmapItem::windowDestroyed);
         } else {
             if (!m_shaderEffect) {
                 m_shaderEffect = static_cast<QQuickItem *>(c->shaderEffectComponent()->create());
